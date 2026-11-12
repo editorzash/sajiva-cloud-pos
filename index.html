@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>Sajiva — Cloud POS &amp; Backoffice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #2563eb;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --primary-hover: #1d4ed8;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --purple: #8b5cf6;
+      --purple-light: #f5f3ff;
+      --bg-body: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all .22s cubic-bezier(.4, 0, .2, 1);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      color: var(--text-main);
+      background: var(--bg-body);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body { height: 100vh; min-width: 320px; margin: 0; overflow: hidden; background: var(--bg-body); font-size: 13px; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+    .app-shell { display: flex; width: 100%; height: 100vh; }
+    .sidebar { z-index: 20; display: flex; flex: 0 0 254px; flex-direction: column; width: 254px; background: var(--sidebar-bg); color: #94a3b8; transition: var(--transition); }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 21px 20px 19px; color: #f8fafc; font-size: 19px; font-weight: 800; letter-spacing: -.7px; }
+    .brand-mark { display: grid; width: 37px; height: 37px; place-items: center; border-radius: 12px; background: linear-gradient(140deg, #60a5fa, #4f46e5); box-shadow: 0 7px 17px #2563eb55; color: #fff; font-size: 17px; }
+    .brand small { display: block; margin-top: 2px; color: #64748b; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; }
+    .outlet-switch { display: flex; align-items: center; gap: 11px; margin: 0 13px 15px; padding: 12px; border: 1px solid #ffffff12; border-radius: 12px; background: #ffffff08; color: #fff; text-align: left; }
+    .outlet-switch:hover { background: #ffffff12; }
+    .outlet-icon { display: grid; width: 33px; height: 33px; flex: 0 0 33px; place-items: center; border-radius: 10px; background: #2563eb2e; color: #60a5fa; }
+    .outlet-copy { min-width: 0; flex: 1; }
+    .outlet-copy small { display: block; margin-bottom: 3px; color: #64748b; font-size: 9px; }
+    .outlet-copy strong { display: block; overflow: hidden; color: #e2e8f0; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 1px 11px 15px; scrollbar-color: #334155 transparent; scrollbar-width: thin; }
+    .nav-group { margin: 17px 9px 8px; color: #64748b; font-size: 9px; font-weight: 800; letter-spacing: 1.35px; }
+    .nav-item { display: flex; width: 100%; align-items: center; gap: 11px; margin: 3px 0; padding: 10px 12px; border: 0; border-radius: 9px; background: transparent; color: #94a3b8; text-align: left; transition: var(--transition); }
+    .nav-item i { width: 17px; font-size: 14px; text-align: center; }
+    .nav-item span { flex: 1; font-size: 11px; font-weight: 600; }
+    .nav-item:hover { background: var(--sidebar-hover); color: #f8fafc; }
+    .nav-item.active { background: var(--sidebar-active); box-shadow: 0 5px 14px #2563eb55; color: #fff; }
+    .live-badge { padding: 3px 6px; border-radius: 5px; background: #ef444433; color: #fca5a5; font-size: 8px; font-weight: 800; letter-spacing: .5px; }
+    .user-footer { display: flex; align-items: center; gap: 10px; padding: 14px 15px; border-top: 1px solid #ffffff12; }
+    .avatar { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-size: 11px; font-weight: 800; }
+    .user-copy { min-width: 0; flex: 1; }
+    .user-copy strong, .user-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-copy strong { color: #f1f5f9; font-size: 10px; }
+    .user-copy small { margin-top: 3px; color: #64748b; font-size: 9px; }
+    .logout { border: 0; background: none; color: #64748b; font-size: 14px; }
+    .logout:hover { color: #fca5a5; }
+    .workspace { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+    .topbar { z-index: 5; display: flex; height: 70px; flex: 0 0 70px; align-items: center; gap: 20px; padding: 0 28px; border-bottom: 1px solid var(--border-color); background: #fff; }
+    .mobile-menu { display: none; width: 36px; height: 36px; border: 1px solid var(--border-color); border-radius: 9px; background: #fff; color: var(--text-main); }
+    .page-heading { display: flex; min-width: 205px; align-items: center; gap: 11px; }
+    .heading-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 11px; background: var(--primary-light); color: var(--primary); }
+    .page-heading h1 { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.35px; }
+    .page-heading p { margin: 3px 0 0; color: var(--text-muted); font-size: 10px; }
+    .top-search { position: relative; width: min(310px, 30vw); margin-left: auto; transition: var(--transition); }
+    .top-search:focus-within { width: min(365px, 36vw); }
+    .top-search i { position: absolute; top: 50%; left: 14px; color: #94a3b8; transform: translateY(-50%); }
+    .top-search input { width: 100%; height: 38px; padding: 0 13px 0 37px; border: 1px solid var(--border-color); border-radius: 999px; background: #f8fafc; color: var(--text-main); font-size: 11px; transition: var(--transition); }
+    .top-search input:focus { border-color: #93c5fd; background: #fff; box-shadow: 0 0 0 4px #3b82f61a; outline: 0; }
+    .top-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-button { position: relative; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; color: #64748b; }
+    .icon-button:hover { border-color: #bfdbfe; color: var(--primary); }
+    .notification-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border: 1px solid #fff; border-radius: 50%; background: var(--danger); }
+    .btn-primary, .btn-secondary, .btn-pos, .btn-danger, .btn-quiet { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; padding: 0 13px; border: 1px solid transparent; border-radius: 9px; font-size: 10px; font-weight: 700; transition: var(--transition); white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-secondary { border-color: var(--border-color); background: #fff; color: #475569; }
+    .btn-secondary:hover, .btn-quiet:hover { border-color: #bfdbfe; background: #f8fbff; color: var(--primary); }
+    .btn-pos { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 5px 12px #10b98130; color: #fff; }
+    .btn-pos:hover { box-shadow: 0 8px 17px #10b98140; transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-quiet { min-height: 32px; border-color: var(--border-color); background: #fff; color: #475569; }
+    .main-content { flex: 1; overflow: auto; padding: 25px 28px 36px; scrollbar-color: #cbd5e1 transparent; scrollbar-width: thin; }
+    .main-content::-webkit-scrollbar, .sidebar-nav::-webkit-scrollbar { width: 6px; height: 6px; }
+    .main-content::-webkit-scrollbar-thumb, .sidebar-nav::-webkit-scrollbar-thumb { border-radius: 99px; background: #cbd5e1; }
+    .view-section { display: none; }
+    .view-section.active { display: block; animation: view-in .25s ease both; }
+    @keyframes view-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .page-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 0 0 20px; }
+    .page-intro h2 { margin: 0 0 5px; font-size: 19px; font-weight: 800; letter-spacing: -.65px; }
+    .page-intro p { margin: 0; color: var(--text-muted); font-size: 11px; }
+    .intro-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .card { min-width: 0; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: #fff; box-shadow: 0 3px 12px #0f172a08; transition: var(--transition); }
+    .card:hover { box-shadow: 0 8px 20px #0f172a0b; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 19px 20px 0; }
+    .card-title { margin: 0; font-size: 12px; font-weight: 800; }
+    .card-subtitle { margin: 4px 0 0; color: var(--text-muted); font-size: 10px; }
+    .card-body { padding: 18px 20px 20px; }
+    .section-label { margin: 0 0 12px; color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .period-switch { display: inline-flex; gap: 3px; padding: 4px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; }
+    .period-switch button { padding: 7px 11px; border: 0; border-radius: 7px; background: transparent; color: #64748b; font-size: 9px; font-weight: 700; }
+    .period-switch button.active { background: var(--primary-light); color: var(--primary); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+    .kpi-card { position: relative; padding: 18px 19px; overflow: hidden; }
+    .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #64748b; font-size: 10px; font-weight: 700; }
+    .kpi-icon-wrap { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 11px; font-size: 14px; }
+    .kpi-icon-wrap.blue { background: #eff6ff; color: #2563eb; }
+    .kpi-icon-wrap.green { background: #ecfdf5; color: #059669; }
+    .kpi-icon-wrap.amber { background: #fffbeb; color: #d97706; }
+    .kpi-icon-wrap.purple { background: #f5f3ff; color: #7c3aed; }
+    .kpi-value { margin-top: 14px; font-size: clamp(20px, 2vw, 26px); font-weight: 800; letter-spacing: -.9px; }
+    .kpi-foot { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: #94a3b8; font-size: 9px; }
+    .trend { color: #059669; font-weight: 800; }
+    .dash-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr); gap: 16px; margin-bottom: 16px; }
+    .chart-wrap { height: 255px; padding: 13px 15px 18px; }
+    .donut-wrap { height: 225px; padding: 13px 22px 18px; }
+    .dashboard-bottom { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.55fr); gap: 16px; }
+    .best-list { display: grid; gap: 13px; }
+    .best-row { display: flex; align-items: center; gap: 11px; }
+    .rank { display: grid; width: 27px; height: 27px; flex: 0 0 27px; place-items: center; border-radius: 9px; background: #f1f5f9; color: #64748b; font-size: 10px; font-weight: 800; }
+    .rank.gold { background: #fef3c7; color: #b45309; }
+    .rank.silver { background: #e2e8f0; color: #475569; }
+    .rank.bronze { background: #ffedd5; color: #c2410c; }
+    .best-info { min-width: 0; flex: 1; }
+    .best-info strong, .best-info small { display: block; }
+    .best-info strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .best-info small { margin-top: 3px; color: var(--text-muted); font-size: 9px; }
+    .best-sales { color: #059669; font-size: 9px; font-weight: 800; text-align: right; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+    th { padding: 11px 13px; background: #f8fafc; color: #94a3b8; font-size: 8px; font-weight: 800; letter-spacing: .65px; text-transform: uppercase; }
+    th:first-child { padding-left: 20px; }
+    th:last-child { padding-right: 20px; }
+    td { padding: 12px 13px; border-bottom: 1px solid #f1f5f9; color: #475569; font-size: 9px; }
+    td:first-child { padding-left: 20px; }
+    td:last-child { padding-right: 20px; }
+    tbody tr:hover { background: #fafcff; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .strong-cell { color: var(--text-main); font-weight: 700; }
+    .muted-cell { margin-top: 3px; color: #94a3b8; font-size: 8px; }
+    .badge-status, .tag { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 999px; font-size: 8px; font-weight: 800; }
+    .status-completed { background: var(--success-light); color: #047857; }
+    .status-pending { background: var(--warning-light); color: #b45309; }
+    .status-cancelled { background: var(--danger-light); color: #b91c1c; }
+    .tag-blue { background: var(--primary-light); color: var(--primary); }
+    .tag-purple { background: var(--purple-light); color: #6d28d9; }
+    .tag-orange { background: #fff7ed; color: #c2410c; }
+    .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 19px; border-bottom: 1px solid #f1f5f9; }
+    .table-toolbar p { margin: 0; color: var(--text-muted); font-size: 9px; }
+    .table-filter { min-height: 33px; padding: 0 9px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; color: #475569; font-size: 9px; }
+    .two-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .three-column { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .summary-card { padding: 18px 19px; }
+    .summary-card .summary-label { color: var(--text-muted); font-size: 9px; font-weight: 700; }
+    .summary-card .summary-value { margin: 10px 0 6px; font-size: 22px; font-weight: 800; letter-spacing: -.6px; }
+    .summary-card .summary-note { color: #94a3b8; font-size: 9px; }
+    .summary-card .summary-value.positive { color: #059669; }
+    .summary-card .summary-value.negative { color: #dc2626; }
+    .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 354px; align-items: start; gap: 16px; }
+    .pos-catalog { min-width: 0; }
+    .pos-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+    .category-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .category-pill { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 999px; background: #fff; color: #64748b; font-size: 9px; font-weight: 700; }
+    .category-pill.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+    .pos-search { width: min(220px, 100%); height: 34px; padding: 0 11px; border: 1px solid var(--border-color); border-radius: 9px; background: #fff; font-size: 10px; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; }
+    .product-card { position: relative; min-height: 174px; padding: 13px; overflow: hidden; cursor: pointer; }
+    .product-card:hover { border-color: #bfdbfe; box-shadow: 0 10px 22px #2563eb12; transform: translateY(-2px); }
+    .product-art { display: grid; height: 81px; place-items: center; margin-bottom: 11px; border-radius: 11px; background: var(--art-bg, #eff6ff); color: var(--art-color, #2563eb); font-size: 30px; }
+    .product-name { display: block; min-height: 29px; padding-right: 25px; color: var(--text-main); font-size: 10px; font-weight: 800; line-height: 1.45; }
+    .product-category { display: block; margin-top: 3px; color: #94a3b8; font-size: 8px; }
+    .product-price { display: block; margin-top: 9px; color: var(--primary); font-size: 11px; font-weight: 800; }
+    .product-add { position: absolute; right: 12px; bottom: 13px; display: grid; width: 27px; height: 27px; place-items: center; border: 0; border-radius: 9px; background: var(--primary); color: #fff; }
+    .product-add:hover { background: var(--primary-hover); transform: scale(1.05); }
+    .cart-panel { position: sticky; top: 0; overflow: hidden; }
+    .cart-heading { display: flex; align-items: center; justify-content: space-between; padding: 17px 17px 14px; border-bottom: 1px solid #f1f5f9; }
+    .cart-heading h3 { margin: 0; font-size: 12px; font-weight: 800; }
+    .cart-heading small { display: block; margin-top: 4px; color: #94a3b8; font-size: 9px; }
+    .text-button { padding: 4px; border: 0; background: transparent; color: var(--danger); font-size: 9px; font-weight: 700; }
+    .cart-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
+    .field { display: grid; gap: 6px; }
+    .field label { color: #64748b; font-size: 9px; font-weight: 700; }
+    .field input, .field select, .field textarea { width: 100%; min-height: 35px; padding: 8px 9px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; color: var(--text-main); font-size: 9px; }
+    .field textarea { min-height: 76px; resize: vertical; }
+    .cart-items { min-height: 130px; max-height: 270px; overflow-y: auto; padding: 8px 15px; }
+    .empty-cart { display: grid; min-height: 140px; place-content: center; justify-items: center; color: #94a3b8; text-align: center; }
+    .empty-cart i { margin-bottom: 9px; color: #cbd5e1; font-size: 25px; }
+    .empty-cart strong { color: #64748b; font-size: 10px; }
+    .empty-cart small { margin-top: 5px; font-size: 9px; }
+    .cart-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .cart-item:last-child { border-bottom: 0; }
+    .cart-item-name { overflow: hidden; color: var(--text-main); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .cart-item-price { margin-top: 4px; color: #94a3b8; font-size: 8px; }
+    .qty-control { display: flex; align-items: center; gap: 8px; }
+    .qty-control button { display: grid; width: 23px; height: 23px; place-items: center; border: 1px solid var(--border-color); border-radius: 7px; background: #fff; color: #475569; font-size: 9px; }
+    .qty-control button:hover { border-color: #bfdbfe; color: var(--primary); }
+    .qty-control span { min-width: 10px; color: var(--text-main); font-size: 9px; font-weight: 800; text-align: center; }
+    .cart-summary { padding: 13px 16px 15px; border-top: 1px solid #f1f5f9; background: #fcfdff; }
+    .summary-line { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 9px; color: #64748b; font-size: 9px; }
+    .summary-line strong { color: var(--text-main); font-size: 9px; }
+    .summary-line.total { align-items: center; margin: 13px 0; padding-top: 12px; border-top: 1px dashed var(--border-color); color: var(--text-main); font-size: 11px; font-weight: 800; }
+    .summary-line.total strong { color: var(--primary); font-size: 17px; }
+    .cart-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; }
+    .cart-actions button { min-height: 38px; }
+    .empty-state { padding: 35px 20px; color: var(--text-muted); text-align: center; }
+    .empty-state i { display: block; margin-bottom: 10px; color: #cbd5e1; font-size: 25px; }
+    .inline-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+    .inline-form .field { min-width: 160px; flex: 1; }
+    .stock-meter { display: inline-block; width: 65px; height: 5px; margin-left: 6px; overflow: hidden; border-radius: 99px; background: #e2e8f0; vertical-align: middle; }
+    .stock-meter span { display: block; height: 100%; border-radius: inherit; background: var(--success); }
+    .member-tier { font-weight: 800; }
+    .member-tier.silver { color: #64748b; }
+    .member-tier.gold { color: #b45309; }
+    .member-tier.platinum { color: #7c3aed; }
+    .setting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .setting-list { display: grid; gap: 14px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-row strong, .setting-row small { display: block; }
+    .setting-row strong { font-size: 10px; }
+    .setting-row small { margin-top: 4px; color: var(--text-muted); font-size: 9px; }
+    .switch { width: 34px; height: 19px; accent-color: var(--primary); }
+    .promo-code { display: inline-block; padding: 5px 7px; border: 1px dashed #c4b5fd; border-radius: 6px; background: var(--purple-light); color: #6d28d9; font-size: 8px; font-weight: 800; }
+    code { padding: 4px 6px; border-radius: 5px; background: #f1f5f9; color: #475569; font-size: 8px; }
+    .toast-container { position: fixed; z-index: 100; right: 22px; bottom: 22px; display: grid; gap: 8px; }
+    .toast-popup { display: flex; min-width: 265px; max-width: min(380px, calc(100vw - 32px)); align-items: center; gap: 10px; padding: 13px 16px; border: 1px solid #ffffff12; border-radius: 12px; background: #0f172a; box-shadow: 0 12px 30px #0f172a35; color: #f8fafc; font-size: 10px; animation: toast-in .25s ease both; }
+    .toast-popup i { color: #34d399; font-size: 14px; }
+    .toast-popup.warning i { color: #fbbf24; }
+    .toast-popup.error i { color: #f87171; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .drawer-backdrop { position: fixed; z-index: 15; inset: 0; display: none; background: #0f172a66; }
+    .no-results { grid-column: 1 / -1; padding: 30px; color: var(--text-muted); text-align: center; }
+    .cancelled-amount { color: #94a3b8; text-decoration: line-through; }
+    .chart-fallback { display: grid; height: 100%; place-content: center; color: var(--text-muted); font-size: 10px; text-align: center; }
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dash-grid, .dashboard-bottom { grid-template-columns: 1fr; }
+      .pos-layout { grid-template-columns: 1fr; }
+      .cart-panel { position: static; }
+      .cart-items { max-height: 230px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; inset: 0 auto 0 0; width: 270px; transform: translateX(-102%); }
+      .sidebar.open { transform: translateX(0); }
+      .drawer-backdrop.open { display: block; }
+      .mobile-menu { display: grid; place-items: center; }
+      .topbar { height: 62px; flex-basis: 62px; gap: 10px; padding: 0 13px; }
+      .page-heading { min-width: 0; flex: 1; gap: 8px; }
+      .heading-icon { width: 32px; height: 32px; }
+      .page-heading h1 { font-size: 12px; }
+      .page-heading p { display: none; }
+      .top-search { display: none; }
+      .top-actions { gap: 6px; }
+      .top-actions .help-button { display: none; }
+      .top-actions .btn-pos { width: 36px; min-height: 36px; padding: 0; font-size: 0; }
+      .top-actions .btn-pos i { font-size: 13px; }
+      .main-content { padding: 19px 14px 28px; }
+      .kpi-grid { grid-template-columns: 1fr; gap: 10px; }
+      .kpi-card { padding: 15px 17px; }
+      .kpi-value { font-size: 23px; }
+      .two-column, .three-column, .setting-grid { grid-template-columns: 1fr; }
+      .page-intro { align-items: flex-start; flex-direction: column; }
+      .page-intro h2 { font-size: 17px; }
+      .period-switch { width: 100%; justify-content: space-between; }
+      .period-switch button { flex: 1; padding-inline: 5px; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .product-card { min-height: 166px; padding: 10px; }
+      .product-art { height: 75px; }
+      .pos-controls { align-items: flex-start; flex-direction: column; }
+      .category-pills { gap: 5px; }
+      .category-pill { padding: 7px 9px; font-size: 8px; }
+      .pos-search { width: 100%; }
+      .card-header { padding: 16px 15px 0; }
+      .card-body { padding: 15px; }
+      .table-toolbar { padding: 12px 14px; }
+      th:first-child, td:first-child { padding-left: 14px; }
+      th:last-child, td:last-child { padding-right: 14px; }
+      .chart-wrap { height: 220px; padding-inline: 8px; }
+      .donut-wrap { height: 215px; }
+      .toast-container { right: 12px; bottom: 12px; left: 12px; }
+      .toast-popup { min-width: 0; width: 100%; }
+    }
+    @media print {
+      body { height: auto; overflow: visible; background: #fff; }
+      .sidebar, .topbar, .intro-actions, .period-switch, .toast-container, .table-toolbar button { display: none !important; }
+      .app-shell, .workspace, .main-content { display: block; height: auto; overflow: visible; padding: 0; }
+      .view-section { display: none !important; }
+      .view-section.active { display: block !important; animation: none; }
+      .card { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
+      <div class="brand"><span class="brand-mark">S</span><span>Sajiva<small>SMART COMMERCE</small></span></div>
+      <button class="outlet-switch" type="button" data-action="switch-outlet" aria-label="Ganti outlet">
+        <span class="outlet-icon"><i class="fa-solid fa-store"></i></span>
+        <span class="outlet-copy"><small>OUTLET TERPILIH</small><strong id="outlet-name">Sajiva Kemang</strong></span>
+        <i class="fa-solid fa-chevron-down" style="font-size:9px;color:#64748b"></i>
+      </button>
+      <nav class="sidebar-nav">
+        <p class="nav-group">MENU UTAMA</p>
+        <button class="nav-item active" type="button" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></button>
+        <button class="nav-item" type="button" data-tab="pos"><i class="fa-solid fa-cash-register"></i><span>Kasir / POS</span><b class="live-badge">LIVE</b></button>
+        <button class="nav-item" type="button" data-tab="orders"><i class="fa-solid fa-receipt"></i><span>Riwayat Pesanan</span></button>
+        <button class="nav-item" type="button" data-tab="customers"><i class="fa-solid fa-users"></i><span>Pelanggan</span></button>
+        <p class="nav-group">MANAJEMEN PRODUK</p>
+        <button class="nav-item" type="button" data-tab="products"><i class="fa-solid fa-burger"></i><span>Daftar Produk</span></button>
+        <button class="nav-item" type="button" data-tab="categories"><i class="fa-solid fa-layer-group"></i><span>Kategori &amp; Varian</span></button>
+        <button class="nav-item" type="button" data-tab="inventory"><i class="fa-solid fa-boxes-stacked"></i><span>Stok &amp; Inventori</span></button>
+        <p class="nav-group">LAPORAN &amp; ANALISIS</p>
+        <button class="nav-item" type="button" data-tab="reports"><i class="fa-solid fa-chart-column"></i><span>Laporan Penjualan</span></button>
+        <button class="nav-item" type="button" data-tab="shifts"><i class="fa-solid fa-clock-rotate-left"></i><span>Rekap Kasir &amp; Shift</span></button>
+        <button class="nav-item" type="button" data-tab="taxes"><i class="fa-solid fa-percent"></i><span>Pajak &amp; Diskon</span></button>
+        <p class="nav-group">PENGATURAN</p>
+        <button class="nav-item" type="button" data-tab="branches"><i class="fa-solid fa-shop"></i><span>Kelola Cabang</span></button>
+        <button class="nav-item" type="button" data-tab="printers"><i class="fa-solid fa-print"></i><span>Printer &amp; Struk</span></button>
+        <button class="nav-item" type="button" data-tab="settings"><i class="fa-solid fa-gear"></i><span>Pengaturan Akun</span></button>
+      </nav>
+      <div class="user-footer">
+        <span class="avatar">SA</span><span class="user-copy"><strong>Admin Sajiva</strong><small>Super Admin</small></span>
+        <button class="logout" type="button" data-action="logout" aria-label="Keluar"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+    </aside>
+    <div class="drawer-backdrop" id="drawer-backdrop" data-action="close-sidebar"></div>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" data-action="toggle-sidebar" aria-label="Buka menu"><i class="fa-solid fa-bars"></i></button>
+        <div class="page-heading"><span class="heading-icon"><i id="heading-icon" class="fa-solid fa-chart-pie"></i></span><span><h1 id="page-title">Dashboard</h1><p id="page-subtitle">Ringkasan performa bisnis Anda hari ini</p></span></div>
+        <label class="top-search"><i class="fa-solid fa-magnifying-glass"></i><input id="global-search" type="search" placeholder="Cari produk di kasir..." aria-label="Cari produk"></label>
+        <div class="top-actions">
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifikasi"><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+          <button class="btn-secondary help-button" type="button" data-action="help"><i class="fa-regular fa-circle-question"></i>Bantuan</button>
+          <button class="btn-pos" type="button" data-action="open-pos"><i class="fa-solid fa-cash-register"></i>Buka Mesin Kasir</button>
+        </div>
+      </header>
+      <main class="main-content" id="main-content">
+        <section id="view-dashboard" class="view-section active" aria-label="Dashboard">
+          <div class="page-intro">
+            <div><h2>Selamat siang, Admin! <span aria-hidden="true">☀️</span></h2><p>Berikut performa Sajiva Kemang pada periode terpilih.</p></div>
+            <div class="intro-actions">
+              <div class="period-switch" role="group" aria-label="Filter periode">
+                <button class="active" type="button" data-period="today">Hari Ini</button><button type="button" data-period="yesterday">Kemarin</button><button type="button" data-period="week">7 Hari</button><button type="button" data-period="month">Bulan Ini</button>
+              </div>
+              <button class="btn-secondary" type="button" data-action="export"><i class="fa-solid fa-file-excel"></i>Export Excel</button>
+              <button class="btn-secondary" type="button" data-action="print"><i class="fa-solid fa-print"></i>Cetak PDF</button>
+            </div>
+          </div>
+          <div class="kpi-grid">
+            <article class="card kpi-card"><div class="kpi-top"><span>Gross Sales</span><span class="kpi-icon-wrap blue"><i class="fa-solid fa-wallet"></i></span></div><div class="kpi-value" id="kpi-gross">Rp 24.780.000</div><div class="kpi-foot"><span class="trend">▲ 14,8%</span><span>dibanding periode lalu</span></div></article>
+            <article class="card kpi-card"><div class="kpi-top"><span>Net Sales</span><span class="kpi-icon-wrap green"><i class="fa-solid fa-arrow-trend-up"></i></span></div><div class="kpi-value" id="kpi-net">Rp 22.920.000</div><div class="kpi-foot"><span class="trend">▲ 12,3%</span><span>setelah pajak &amp; diskon</span></div></article>
+            <article class="card kpi-card"><div class="kpi-top"><span>Total Transaksi</span><span class="kpi-icon-wrap amber"><i class="fa-solid fa-receipt"></i></span></div><div class="kpi-value" id="kpi-orders">312</div><div class="kpi-foot"><span class="trend">▲ 8,6%</span><span>rata-rata Rp 79.423</span></div></article>
+            <article class="card kpi-card"><div class="kpi-top"><span>Produk Terjual</span><span class="kpi-icon-wrap purple"><i class="fa-solid fa-bag-shopping"></i></span></div><div class="kpi-value" id="kpi-items">846</div><div class="kpi-foot"><span class="trend">▲ 6,2%</span><span>menu favorit pelanggan</span></div></article>
+          </div>
+          <div class="dash-grid">
+            <article class="card">
+              <div class="card-header"><div><h3 class="card-title">Tren Penjualan</h3><p class="card-subtitle">Performa penjualan per jam · Hari ini</p></div><span class="tag tag-blue"><i class="fa-solid fa-circle" style="font-size:5px"></i> Live</span></div>
+              <div class="chart-wrap"><canvas id="sales-chart" aria-label="Grafik penjualan per jam"></canvas><div class="chart-fallback" id="sales-fallback" hidden>Grafik tersedia saat koneksi CDN aktif.</div></div>
+            </article>
+            <article class="card">
+              <div class="card-header"><div><h3 class="card-title">Metode Pembayaran</h3><p class="card-subtitle">Distribusi transaksi hari ini</p></div><button class="btn-quiet" type="button" data-action="refresh"><i class="fa-solid fa-rotate"></i></button></div>
+              <div class="donut-wrap"><canvas id="payment-chart" aria-label="Grafik metode pembayaran"></canvas><div class="chart-fallback" id="payment-fallback" hidden>Grafik tersedia saat koneksi CDN aktif.</div></div>
+            </article>
+          </div>
+          <div class="dashboard-bottom">
+            <article class="card"><div class="card-header"><div><h3 class="card-title">Menu Terlaris</h3><p class="card-subtitle">Produk dengan penjualan tertinggi</p></div></div><div class="card-body"><div class="best-list" id="best-sellers"></div></div></article>
+            <article class="card">
+              <div class="card-header"><div><h3 class="card-title">Transaksi Terkini</h3><p class="card-subtitle">Aktivitas transaksi outlet Anda</p></div><button class="btn-quiet" type="button" data-action="refresh"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+              <div class="table-wrap"><table><thead><tr><th>No. Struk</th><th>Waktu</th><th>Pelanggan / Meja</th><th>Metode</th><th>Total</th><th>Status</th></tr></thead><tbody id="recent-orders"></tbody></table></div>
+            </article>
+          </div>
+        </section>
+        <div id="generated-views"></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <script>
+    // ===== DATA =====
+    const productsCatalog = [
+      { id: 1, name: "Kebab Beef Jumbo Keju", category: "food", price: 28000, icon: "fa-burger", color: "#ea580c", tint: "#fff7ed", sku: "FOD-001", cost: 14500, stock: 34 },
+      { id: 2, name: "Classic Beef Burger", category: "food", price: 27000, icon: "fa-burger", color: "#b45309", tint: "#fffbeb", sku: "FOD-002", cost: 13800, stock: 28 },
+      { id: 3, name: "Kopi Susu Gula Aren", category: "drink", price: 22000, icon: "fa-mug-hot", color: "#92400e", tint: "#fef3c7", sku: "DRK-001", cost: 8000, stock: 42 },
+      { id: 4, name: "Matcha Latte", category: "drink", price: 25000, icon: "fa-mug-saucer", color: "#15803d", tint: "#f0fdf4", sku: "DRK-002", cost: 9500, stock: 31 },
+      { id: 5, name: "Kentang Goreng", category: "snack", price: 18000, icon: "fa-bacon", color: "#ca8a04", tint: "#fefce8", sku: "SNK-001", cost: 6500, stock: 56 },
+      { id: 6, name: "Mozzarella Stick", category: "snack", price: 23000, icon: "fa-cheese", color: "#d97706", tint: "#fffbeb", sku: "SNK-002", cost: 10500, stock: 18 },
+      { id: 7, name: "Choco Lava Cake", category: "dessert", price: 26000, icon: "fa-cookie-bite", color: "#7c2d12", tint: "#fff7ed", sku: "DST-001", cost: 11500, stock: 16 },
+      { id: 8, name: "Butter Croissant", category: "dessert", price: 19000, icon: "fa-bread-slice", color: "#b45309", tint: "#fffbeb", sku: "DST-002", cost: 7000, stock: 24 },
+      { id: 9, name: "Chicken Kebab Original", category: "food", price: 24000, icon: "fa-drumstick-bite", color: "#dc2626", tint: "#fef2f2", sku: "FOD-003", cost: 11700, stock: 39 },
+      { id: 10, name: "Lemon Tea Dingin", category: "drink", price: 16000, icon: "fa-glass-water", color: "#0891b2", tint: "#ecfeff", sku: "DRK-003", cost: 4500, stock: 47 },
+      { id: 11, name: "Onion Ring", category: "snack", price: 17000, icon: "fa-circle", color: "#d97706", tint: "#fff7ed", sku: "SNK-003", cost: 5200, stock: 9 },
+      { id: 12, name: "Es Kopi Caramel", category: "drink", price: 24000, icon: "fa-martini-glass", color: "#7c3aed", tint: "#f5f3ff", sku: "DRK-004", cost: 9000, stock: 22 }
+    ];
+    const categoryNames = { food: "Makanan", drink: "Minuman", snack: "Camilan", dessert: "Dessert" };
+    let cart = [];
+    let currentCategory = "all";
+    let currentPeriod = "today";
+    let currentOutlet = 0;
+    let orderNumber = makeOrderNumber();
+    let heldBill = null;
+    let activeSalesChart = null;
+    let activePaymentChart = null;
+    const outlets = ["Sajiva Kemang", "Sajiva Dago", "Sajiva Menteng"];
+    const paymentMethods = ["QRIS BCA", "Tunai", "Debit BCA", "GoPay", "OVO", "QRIS Shopee"];
+    const transactions = [
+      { id: "SJ-240819-0312", time: "14:32", customer: "Meja 08 · Rani P.", method: "QRIS BCA", total: 89000, status: "Selesai", items: "Kebab Beef ×2, Kopi Susu ×1", cashier: "Ayu Lestari" },
+      { id: "SJ-240819-0311", time: "14:28", customer: "Take Away · Dimas", method: "Tunai", total: 46000, status: "Selesai", items: "Matcha Latte ×1, Croissant ×1", cashier: "Dimas P." },
+      { id: "SJ-240819-0310", time: "14:19", customer: "Meja 03 · Nia", method: "Debit BCA", total: 72000, status: "Selesai", items: "Classic Beef Burger ×2", cashier: "Ayu Lestari" },
+      { id: "SJ-240819-0309", time: "14:05", customer: "Meja 11 · Batal", method: "—", total: 28000, status: "Batal", items: "Kebab Beef ×1", cashier: "Rizky A." },
+      { id: "SJ-240819-0308", time: "13:52", customer: "Delivery · Bagas", method: "GoPay", total: 63000, status: "Selesai", items: "Kebab Chicken ×1, Lemon Tea ×1, Onion Ring ×1", cashier: "Ayu Lestari" }
+    ];
+    const periodMetrics = {
+      today: { gross: 24780000, net: 22920000, orders: 312, items: 846, label: "Hari ini" },
+      yesterday: { gross: 21850000, net: 20210000, orders: 284, items: 791, label: "Kemarin" },
+      week: { gross: 168420000, net: 155790000, orders: 2187, items: 5940, label: "7 hari terakhir" },
+      month: { gross: 612850000, net: 566880000, orders: 7984, items: 21850, label: "Bulan ini" }
+    };
+    const titleMap = {
+      dashboard: { title: "Dashboard", subtitle: "Ringkasan performa bisnis Anda hari ini", icon: "fa-chart-pie" },
+      pos: { title: "Kasir / POS", subtitle: "Buat pesanan baru dan proses pembayaran", icon: "fa-cash-register" },
+      orders: { title: "Riwayat Pesanan", subtitle: "Pantau dan kelola transaksi outlet", icon: "fa-receipt" },
+      customers: { title: "Pelanggan", subtitle: "Kelola member dan program loyalitas", icon: "fa-users" },
+      products: { title: "Daftar Produk", subtitle: "Atur menu, harga, dan ketersediaan", icon: "fa-burger" },
+      categories: { title: "Kategori & Varian", subtitle: "Kelola kategori menu dan pilihan tambahan", icon: "fa-layer-group" },
+      inventory: { title: "Stok & Inventori", subtitle: "Pantau bahan baku dan kebutuhan restock", icon: "fa-boxes-stacked" },
+      reports: { title: "Laporan Penjualan", subtitle: "Analisis omset, HPP, dan laba outlet", icon: "fa-chart-column" },
+      shifts: { title: "Rekap Kasir & Shift", subtitle: "Rekonsiliasi kas dan aktivitas shift", icon: "fa-clock-rotate-left" },
+      taxes: { title: "Pajak & Diskon", subtitle: "Atur tarif pajak dan promo berjalan", icon: "fa-percent" },
+      branches: { title: "Kelola Cabang", subtitle: "Informasi outlet dalam satu jaringan", icon: "fa-shop" },
+      printers: { title: "Printer & Struk", subtitle: "Atur perangkat cetak dan preferensi struk", icon: "fa-print" },
+      settings: { title: "Pengaturan Akun", subtitle: "Sesuaikan identitas bisnis dan struk", icon: "fa-gear" }
+    };
+    const formatRupiah = (amount) => "Rp " + Math.round(amount).toLocaleString("id-ID");
+    const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    function makeOrderNumber() { return "SJ-" + String(Date.now()).slice(-6); }
+    function statusBadge(status) {
+      const variant = status === "Selesai" ? "status-completed" : status === "Menunggu" ? "status-pending" : "status-cancelled";
+      return `<span class="badge-status ${variant}">${escapeHTML(status)}</span>`;
+    }
+
+    // ===== ROUTER =====
+    function navigateTab(tabName, element) {
+      const section = document.getElementById("view-" + tabName);
+      if (!section || !titleMap[tabName]) {
+        showToast("Halaman tidak ditemukan.", "error");
+        return;
+      }
+      document.querySelectorAll(".view-section").forEach((view) => view.classList.remove("active"));
+      section.classList.add("active");
+      document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.tab === tabName));
+      const metadata = titleMap[tabName];
+      document.getElementById("page-title").textContent = metadata.title;
+      document.getElementById("page-subtitle").textContent = metadata.subtitle;
+      document.getElementById("heading-icon").className = "fa-solid " + metadata.icon;
+      if (element && element.classList) element.classList.add("active");
+      document.getElementById("main-content").scrollTop = 0;
+      closeSidebar();
+      if (tabName === "pos") renderPosProducts(currentCategory, document.getElementById("global-search").value);
+      if (tabName === "orders") renderOrderHistory();
+    }
+    function openDirectPos() { navigateTab("pos"); }
+
+    // ===== POS =====
+    function renderPosProducts(category, keyword) {
+      const grid = document.getElementById("product-grid");
+      if (!grid) return;
+      const query = String(keyword || "").trim().toLocaleLowerCase("id-ID");
+      const visibleProducts = productsCatalog.filter((product) => (category === "all" || product.category === category) && (!query || product.name.toLocaleLowerCase("id-ID").includes(query)));
+      grid.innerHTML = visibleProducts.length ? visibleProducts.map((product) => `
+        <article class="card product-card" data-add-product="${product.id}" tabindex="0" role="button" aria-label="Tambah ${escapeHTML(product.name)}">
+          <div class="product-art" style="--art-color:${product.color};--art-bg:${product.tint}"><i class="fa-solid ${product.icon}"></i></div>
+          <span class="product-name">${escapeHTML(product.name)}</span><span class="product-category">${categoryNames[product.category]}</span>
+          <span class="product-price">${formatRupiah(product.price)}</span><button class="product-add" type="button" data-add-product="${product.id}" aria-label="Tambah ${escapeHTML(product.name)}"><i class="fa-solid fa-plus"></i></button>
+        </article>`).join("") : `<div class="no-results"><i class="fa-solid fa-magnifying-glass"></i><p>Produk tidak ditemukan.</p></div>`;
+    }
+    function filterPosCategory(category, element) {
+      currentCategory = category;
+      document.querySelectorAll(".category-pill").forEach((pill) => pill.classList.toggle("active", pill.dataset.category === category));
+      renderPosProducts(currentCategory, document.getElementById("global-search").value);
+    }
+    function addToCart(productId) {
+      const product = productsCatalog.find((item) => item.id === Number(productId));
+      if (!product) {
+        showToast("Produk tidak ditemukan.", "error");
+        return;
+      }
+      const existing = cart.find((item) => item.id === product.id);
+      if (existing) existing.qty += 1;
+      else cart.push({ ...product, qty: 1 });
+      renderCart();
+      showToast(`${product.name} ditambahkan ke keranjang.`);
+    }
+
+    // ===== CART LOGIC =====
+    function updateQty(productId, delta) {
+      const item = cart.find((entry) => entry.id === Number(productId));
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter((entry) => entry.id !== Number(productId));
+      renderCart();
+    }
+    function clearCart(silent) {
+      if (!cart.length && !heldBill) {
+        if (!silent) showToast("Keranjang sudah kosong.", "warning");
+        return;
+      }
+      cart = [];
+      heldBill = null;
+      orderNumber = makeOrderNumber();
+      renderCart();
+      if (!silent) showToast("Keranjang berhasil dikosongkan.", "warning");
+    }
+    function renderCart() {
+      const cartItems = document.getElementById("cart-items");
+      if (!cartItems) return;
+      const subtotal = cart.reduce((total, item) => total + item.price * item.qty, 0);
+      const tax = Math.round(subtotal * 0.1);
+      cartItems.innerHTML = cart.length ? cart.map((item) => `
+        <div class="cart-item">
+          <div><div class="cart-item-name">${escapeHTML(item.name)}</div><div class="cart-item-price">${formatRupiah(item.price)} × ${item.qty} · ${formatRupiah(item.price * item.qty)}</div></div>
+          <div class="qty-control"><button type="button" data-action="qty" data-id="${item.id}" data-delta="-1" aria-label="Kurangi jumlah"><i class="fa-solid fa-minus"></i></button><span>${item.qty}</span><button type="button" data-action="qty" data-id="${item.id}" data-delta="1" aria-label="Tambah jumlah"><i class="fa-solid fa-plus"></i></button></div>
+        </div>`).join("") : `<div class="empty-cart"><i class="fa-solid fa-basket-shopping"></i><strong>Keranjang masih kosong</strong><small>Pilih menu favorit untuk memulai pesanan.</small></div>`;
+      document.getElementById("order-number").textContent = orderNumber;
+      document.getElementById("cart-subtotal").textContent = formatRupiah(subtotal);
+      document.getElementById("cart-tax").textContent = formatRupiah(tax);
+      document.getElementById("cart-total").textContent = formatRupiah(subtotal + tax);
+    }
+    function processPayment() {
+      if (!cart.length) {
+        showToast("Tambahkan produk sebelum memproses pembayaran.", "warning");
+        return;
+      }
+      const subtotal = cart.reduce((total, item) => total + item.price * item.qty, 0);
+      const name = document.getElementById("customer-name").value.trim();
+      const type = document.getElementById("order-type").value;
+      const transaction = {
+        id: orderNumber,
+        time: new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" }).format(new Date()),
+        customer: name || (type === "Dine In" ? "Meja baru" : type + " · Pelanggan"),
+        method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+        total: subtotal + Math.round(subtotal * 0.1),
+        status: "Selesai",
+        items: cart.map((item) => `${item.name} ×${item.qty}`).join(", "),
+        cashier: "Ayu Lestari"
+      };
+      transactions.unshift(transaction);
+      cart = [];
+      orderNumber = makeOrderNumber();
+      document.getElementById("customer-name").value = "";
+      renderCart();
+      renderRecentOrders();
+      renderOrderHistory();
+      showToast(`Pembayaran ${transaction.id} berhasil · ${formatRupiah(transaction.total)}.`);
+    }
+    function holdCurrentBill() {
+      if (!cart.length) {
+        showToast("Keranjang kosong. Tambahkan produk sebelum hold.", "warning");
+        return;
+      }
+      heldBill = { items: cart.map((item) => ({ ...item })), order: orderNumber };
+      cart = [];
+      orderNumber = makeOrderNumber();
+      renderCart();
+      showToast(`Pesanan ${heldBill.order} disimpan sementara.`);
+    }
+
+    // ===== DASHBOARD =====
+    function renderRecentOrders() {
+      const tbody = document.getElementById("recent-orders");
+      if (!tbody) return;
+      tbody.innerHTML = transactions.slice(0, 5).map((transaction) => `
+        <tr><td class="strong-cell">${escapeHTML(transaction.id)}</td><td>${escapeHTML(transaction.time)} WIB</td><td>${escapeHTML(transaction.customer)}</td><td><span class="tag tag-blue">${escapeHTML(transaction.method)}</span></td><td class="${transaction.status === "Batal" ? "cancelled-amount" : "strong-cell"}">${formatRupiah(transaction.total)}</td><td>${statusBadge(transaction.status)}</td></tr>`).join("");
+    }
+    function renderOrderHistory() {
+      const tbody = document.getElementById("order-history-body");
+      if (!tbody) return;
+      tbody.innerHTML = transactions.map((transaction) => `
+        <tr><td class="strong-cell">${escapeHTML(transaction.id)}</td><td>19 Agu 2026 · ${escapeHTML(transaction.time)} WIB</td><td>${escapeHTML(transaction.cashier)}</td><td>${escapeHTML(transaction.customer)}</td><td>${escapeHTML(transaction.items)}</td><td><span class="tag tag-blue">${escapeHTML(transaction.method)}</span></td><td class="${transaction.status === "Batal" ? "cancelled-amount" : "strong-cell"}">${formatRupiah(transaction.total)}</td><td>${statusBadge(transaction.status)}</td><td><button class="btn-quiet" type="button" data-action="receipt" data-id="${escapeHTML(transaction.id)}"><i class="fa-solid fa-print"></i> Struk</button></td></tr>`).join("");
+    }
+    function setPeriod(period, element) {
+      if (!periodMetrics[period]) return;
+      currentPeriod = period;
+      document.querySelectorAll("[data-period]").forEach((button) => button.classList.toggle("active", button.dataset.period === period));
+      const metric = periodMetrics[period];
+      document.getElementById("kpi-gross").textContent = formatRupiah(metric.gross);
+      document.getElementById("kpi-net").textContent = formatRupiah(metric.net);
+      document.getElementById("kpi-orders").textContent = metric.orders.toLocaleString("id-ID");
+      document.getElementById("kpi-items").textContent = metric.items.toLocaleString("id-ID");
+      if (activeSalesChart) {
+        const multiplier = period === "today" ? 1 : period === "yesterday" ? .88 : period === "week" ? 1.3 : 1.65;
+        activeSalesChart.data.datasets[0].data = [420, 680, 510, 940, 770, 1230, 910, 1510, 1290, 1740, 1450, 1980].map((value) => Math.round(value * multiplier * 1000));
+        activeSalesChart.update();
+      }
+      showToast(`Ringkasan diperbarui: ${metric.label}.`);
+    }
+    function refreshOrders() {
+      renderRecentOrders();
+      showToast("Data transaksi berhasil diperbarui.");
+    }
+    function initializeCharts() {
+      if (!window.Chart) {
+        document.getElementById("sales-chart").hidden = true;
+        document.getElementById("payment-chart").hidden = true;
+        document.getElementById("sales-fallback").hidden = false;
+        document.getElementById("payment-fallback").hidden = false;
+        return;
+      }
+      const salesCanvas = document.getElementById("sales-chart");
+      const salesContext = salesCanvas.getContext("2d");
+      const gradient = salesContext.createLinearGradient(0, 0, 0, 260);
+      gradient.addColorStop(0, "rgba(37, 99, 235, .22)");
+      gradient.addColorStop(1, "rgba(37, 99, 235, 0)");
+      activeSalesChart = new Chart(salesCanvas, {
+        type: "line",
+        data: { labels: ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"], datasets: [{ data: [420000, 680000, 510000, 940000, 770000, 1230000, 910000, 1510000, 1290000, 1740000, 1450000, 1980000], borderColor: "#2563eb", backgroundColor: gradient, fill: true, tension: .38, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5 }] },
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => " " + formatRupiah(context.parsed.y) } } }, scales: { x: { grid: { display: false }, ticks: { color: "#94a3b8", font: { family: "Plus Jakarta Sans", size: 9 } }, border: { display: false } }, y: { beginAtZero: true, grid: { color: "#f1f5f9" }, ticks: { color: "#94a3b8", font: { family: "Plus Jakarta Sans", size: 9 }, callback: (value) => "Rp " + (value >= 1000000 ? (value / 1000000).toFixed(1) + "M" : (value / 1000).toFixed(0) + "K") }, border: { display: false } } } }
+      });
+      activePaymentChart = new Chart(document.getElementById("payment-chart"), {
+        type: "doughnut",
+        data: { labels: ["QRIS", "Tunai", "Kartu Debit/Kredit", "E-Wallet"], datasets: [{ data: [42, 27, 18, 13], backgroundColor: ["#2563eb", "#10b981", "#f59e0b", "#8b5cf6"], borderWidth: 0, hoverOffset: 5 }] },
+        options: { cutout: "72%", maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 16, color: "#64748b", font: { family: "Plus Jakarta Sans", size: 9 } } }, tooltip: { callbacks: { label: (context) => `${context.label}: ${context.parsed}%` } } } }
+      });
+    }
+    function renderBestSellers() {
+      const best = [
+        { name: "Kebab Beef Jumbo Keju", category: "Makanan", sold: 128, sales: 3584000 },
+        { name: "Kopi Susu Gula Aren", category: "Minuman", sold: 96, sales: 2112000 },
+        { name: "Classic Beef Burger", category: "Makanan", sold: 81, sales: 2187000 },
+        { name: "Kentang Goreng", category: "Camilan", sold: 73, sales: 1314000 },
+        { name: "Matcha Latte", category: "Minuman", sold: 64, sales: 1600000 }
+      ];
+      document.getElementById("best-sellers").innerHTML = best.map((item, index) => `<div class="best-row"><span class="rank ${index === 0 ? "gold" : index === 1 ? "silver" : index === 2 ? "bronze" : ""}">${index + 1}</span><span class="best-info"><strong>${item.name}</strong><small>${item.category} · ${item.sold} terjual</small></span><span class="best-sales">${formatRupiah(item.sales)}</span></div>`).join("");
+    }
+
+    // ===== UTIL =====
+    function showToast(message, type) {
+      const toast = document.createElement("div");
+      toast.className = "toast-popup" + (type ? " " + type : "");
+      const icon = type === "warning" ? "fa-triangle-exclamation" : type === "error" ? "fa-circle-xmark" : "fa-circle-check";
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${escapeHTML(message)}</span>`;
+      document.getElementById("toast-container").appendChild(toast);
+      window.setTimeout(() => toast.remove(), 2800);
+    }
+    function switchOutlet() {
+      currentOutlet = (currentOutlet + 1) % outlets.length;
+      document.getElementById("outlet-name").textContent = outlets[currentOutlet];
+      showToast(`Outlet aktif: ${outlets[currentOutlet]}.`);
+    }
+    function handleSearch(value) {
+      renderPosProducts(currentCategory, value);
+      if (value.trim()) navigateTab("pos");
+    }
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("drawer-backdrop").classList.toggle("open");
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("drawer-backdrop").classList.remove("open");
+    }
+    function exportTransactions() {
+      const rows = [["No. Struk", "Waktu WIB", "Pelanggan/Meja", "Metode", "Total", "Status"], ...transactions.map((item) => [item.id, item.time, item.customer, item.method, item.total, item.status])];
+      const csv = "\uFEFF" + rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      link.download = "sajiva-transaksi.csv";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("Laporan transaksi berhasil diekspor.");
+    }
+
+    // ===== VIEW TEMPLATES =====
+    function tableCard(title, subtitle, headers, rows, actions) {
+      return `<article class="card"><div class="card-header"><div><h3 class="card-title">${title}</h3><p class="card-subtitle">${subtitle}</p></div>${actions || ""}</div><div class="table-wrap" style="margin-top:16px"><table><thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></article>`;
+    }
+    function moduleSection(id, title, description, body, actions) {
+      return `<section id="view-${id}" class="view-section"><div class="page-intro"><div><h2>${title}</h2><p>${description}</p></div><div class="intro-actions">${actions || ""}</div></div>${body}</section>`;
+    }
+    function standardRow(main, secondary, rest) {
+      return `<tr><td><span class="strong-cell">${main}</span>${secondary ? `<div class="muted-cell">${secondary}</div>` : ""}</td>${rest}</tr>`;
+    }
+    function makeGeneratedViews() {
+      const productRows = productsCatalog.map((product) => {
+        const stockState = product.stock < 10 ? ["Habis", "status-cancelled"] : product.stock < 20 ? ["Menipis", "status-pending"] : ["Tersedia", "status-completed"];
+        return `<tr><td><span class="strong-cell">${product.name}</span><div class="muted-cell">Menu pilihan pelanggan Sajiva</div></td><td><span class="tag tag-blue">${categoryNames[product.category]}</span></td><td><code>${product.sku}</code></td><td>${formatRupiah(product.cost)}</td><td class="strong-cell">${formatRupiah(product.price)}</td><td>${product.stock} unit <span class="stock-meter"><span style="width:${Math.min(product.stock * 2, 100)}%;background:${product.stock < 10 ? "#ef4444" : product.stock < 20 ? "#f59e0b" : "#10b981"}"></span></span></td><td><span class="badge-status ${stockState[1]}">${stockState[0]}</span></td><td><button class="btn-quiet" type="button" data-action="edit-product" data-id="${product.id}"><i class="fa-solid fa-pen"></i> Edit</button></td></tr>`;
+      }).join("");
+      const customerRows = [
+        ["Nadia Putri", "nadia.putri@email.id", "0812-8301-2290", "1.240", "32", "Rp 4.820.000", "Platinum VIP", "platinum"],
+        ["Rizky Ramadhan", "rizky.r@email.id", "0813-7792-4118", "860", "21", "Rp 2.940.000", "Gold", "gold"],
+        ["Ayu Maharani", "ayu.m@email.id", "0856-0214-9088", "430", "12", "Rp 1.680.000", "Silver", "silver"],
+        ["Dimas Pratama", "dimas.p@email.id", "0812-9911-6320", "315", "9", "Rp 1.120.000", "Silver", "silver"]
+      ].map((member) => `<tr><td><span class="strong-cell">${member[0]}</span><div class="muted-cell">${member[1]}</div></td><td>${member[2]}</td><td><span class="tag" style="background:#fffbeb;color:#b45309"><i class="fa-solid fa-star"></i> ${member[3]} poin</span></td><td>${member[4]} kali</td><td class="strong-cell">${member[5]}</td><td><span class="member-tier ${member[7]}">${member[6]}</span></td></tr>`).join("");
+      const branchRows = [
+        ["Sajiva Kemang", "Jl. Kemang Raya No. 18, Jakarta Selatan", "(021) 719-8801", "4 mesin", "Online"],
+        ["Sajiva Dago", "Jl. Ir. H. Juanda No. 92, Bandung", "(022) 250-7712", "3 mesin", "Online"],
+        ["Sajiva Menteng", "Jl. Teuku Cik Ditiro No. 7, Jakarta Pusat", "(021) 3190-4420", "2 mesin", "Online"]
+      ].map((branch) => `<tr><td class="strong-cell">${branch[0]}</td><td>${branch[1]}</td><td>${branch[2]}</td><td>${branch[3]}</td><td><span class="badge-status status-completed"><i class="fa-solid fa-circle" style="font-size:5px"></i>${branch[4]}</span></td></tr>`).join("");
+      const inventory = [
+        ["Daging sapi slice", "Kilogram", "8,5 kg", "5 kg", 1275000, "Aman", "status-completed"],
+        ["Biji kopi arabika", "Kilogram", "3 kg", "4 kg", 690000, "Menipis", "status-pending"],
+        ["Susu segar", "Liter", "2 liter", "6 liter", 56000, "Kritis", "status-cancelled"],
+        ["Keju mozzarella", "Kilogram", "1,2 kg", "2 kg", 216000, "Menipis", "status-pending"],
+        ["Tepung terigu", "Kilogram", "14 kg", "5 kg", 196000, "Aman", "status-completed"]
+      ].map((item) => `<tr><td class="strong-cell">${item[0]}</td><td>${item[1]}</td><td>${item[2]}</td><td>${item[3]}</td><td>${formatRupiah(item[4])}</td><td><span class="badge-status ${item[6]}">${item[5]}</span></td><td>${item[5] === "Kritis" ? `<button class="btn-danger" type="button" data-action="restock"><i class="fa-solid fa-truck-ramp-box"></i> Restock</button>` : `<button class="btn-quiet" type="button" data-action="restock">Atur stok</button>`}</td></tr>`).join("");
+      const orderBody = `<article class="card"><div class="table-toolbar"><p>Menampilkan ${transactions.length} transaksi terakhir</p><div class="intro-actions"><input class="table-filter" type="date" aria-label="Filter tanggal"><button class="btn-primary" type="button" data-action="filter-date"><i class="fa-solid fa-filter"></i>Filter</button></div></div><div class="table-wrap"><table><thead><tr><th>No. Struk</th><th>Tanggal &amp; Jam</th><th>Kasir</th><th>Customer / Meja</th><th>Item Pesanan</th><th>Metode Bayar</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="order-history-body"></tbody></table></div></article>`;
+      const customerBody = `<article class="card">${`<div class="table-toolbar"><p>Member terdaftar · 4 pelanggan aktif hari ini</p></div>`}<div class="table-wrap"><table><thead><tr><th>Nama Pelanggan</th><th>No. WhatsApp</th><th>Poin</th><th>Kunjungan</th><th>Total Belanja</th><th>Tier Member</th></tr></thead><tbody>${customerRows}</tbody></table></div></article>`;
+      const templates = [
+        moduleSection("products", "Daftar Produk", "Kelola harga jual, HPP, SKU, dan ketersediaan menu.", tableCard("Katalog Menu Sajiva", "Daftar produk yang tersedia di mesin kasir", ["Nama Produk", "Kategori", "SKU", "Harga Modal", "Harga Jual", "Stok", "Status", "Aksi"], productRows), `<button class="btn-secondary" type="button" data-action="import"><i class="fa-solid fa-file-import"></i>Impor</button><button class="btn-primary" type="button" data-action="add-product"><i class="fa-solid fa-plus"></i>Tambah Produk</button>`),
+        moduleSection("categories", "Kategori & Varian", "Kelompokkan menu dan opsi tambahan untuk pesanan pelanggan.", `<div class="two-column">${tableCard("Kategori Menu", "Kategori produk aktif", ["Kategori", "Ikon", "Jumlah Menu", "Status"], `<tr><td class="strong-cell">Makanan</td><td><span class="kpi-icon-wrap amber"><i class="fa-solid fa-burger"></i></span></td><td>3 menu</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Minuman</td><td><span class="kpi-icon-wrap blue"><i class="fa-solid fa-mug-hot"></i></span></td><td>4 menu</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Camilan</td><td><span class="kpi-icon-wrap green"><i class="fa-solid fa-cookie-bite"></i></span></td><td>3 menu</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Dessert</td><td><span class="kpi-icon-wrap purple"><i class="fa-solid fa-ice-cream"></i></span></td><td>2 menu</td><td>${statusBadge("Selesai")}</td></tr>`)}${tableCard("Modifier & Add-on", "Pilihan tambahan pada menu", ["Nama Modifier", "Tipe", "Biaya Tambahan", "Status"], `<tr><td class="strong-cell">Level Pedas</td><td>Pilihan rasa</td><td>Gratis</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Extra Keju</td><td>Add-on</td><td>${formatRupiah(5000)}</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Pilihan Susu</td><td>Pilihan bahan</td><td>${formatRupiah(3000)}</td><td>${statusBadge("Selesai")}</td></tr><tr><td class="strong-cell">Extra Shot Espresso</td><td>Add-on</td><td>${formatRupiah(7000)}</td><td>${statusBadge("Selesai")}</td></tr>`)}</div>`, `<button class="btn-primary" type="button" data-action="add-category"><i class="fa-solid fa-plus"></i>Tambah Kategori</button>`),
+        moduleSection("inventory", "Stok & Inventori", "Stok bahan baku outlet dipantau terhadap batas minimum.", tableCard("Bahan Baku", "Nilai aset dan status ketersediaan saat ini", ["Nama Bahan", "Satuan", "Stok Saat Ini", "Batas Minimum", "Nilai Aset", "Status", "Aksi"], inventory), `<button class="btn-secondary" type="button" data-action="stocktake"><i class="fa-solid fa-clipboard-check"></i>Stock Opname</button><button class="btn-primary" type="button" data-action="restock"><i class="fa-solid fa-truck"></i>Order Bahan</button>`),
+        moduleSection("reports", "Laporan Penjualan", "Ringkasan finansial outlet pada periode bulan berjalan.", `<div class="three-column" style="margin-bottom:16px"><article class="card summary-card"><span class="summary-label">Total Omset</span><div class="summary-value">${formatRupiah(612850000)}</div><span class="summary-note"><span class="trend">▲ 12,8%</span> dibanding bulan lalu</span></article><article class="card summary-card"><span class="summary-label">Estimasi HPP / COGS</span><div class="summary-value negative">${formatRupiah(214497500)}</div><span class="summary-note">35% dari total omset</span></article><article class="card summary-card"><span class="summary-label">Laba Kotor</span><div class="summary-value positive">${formatRupiah(398352500)}</div><span class="summary-note">Margin kotor 65%</span></article></div><article class="card"><div class="card-header"><div><h3 class="card-title">Ringkasan Operasional</h3><p class="card-subtitle">Performa penjualan dari seluruh kanal</p></div><button class="btn-secondary" type="button" data-action="print"><i class="fa-solid fa-file-pdf"></i>Unduh PDF</button></div><div class="card-body"><div class="two-column"><div class="setting-row"><span><strong>Transaksi selesai</strong><small>Rata-rata nilai transaksi</small></span><strong>7.984 · Rp 76.756</strong></div><div class="setting-row"><span><strong>Produk terjual</strong><small>Rata-rata per hari</small></span><strong>21.850 · 728 item</strong></div><div class="setting-row"><span><strong>Diskon diberikan</strong><small>Penggunaan promo berjalan</small></span><strong>${formatRupiah(18500000)}</strong></div><div class="setting-row"><span><strong>Pajak terkumpul</strong><small>PB1 10%</small></span><strong>${formatRupiah(56688000)}</strong></div></div></div></article>`),
+        moduleSection("shifts", "Rekap Kasir & Shift", "Pencocokan kas fisik dengan penjualan tercatat hari ini.", `<div class="three-column" style="margin-bottom:16px"><article class="card summary-card"><span class="summary-label">Modal Awal (Kas Float)</span><div class="summary-value">${formatRupiah(1000000)}</div><span class="summary-note">Shift pagi · Ayu Lestari</span></article><article class="card summary-card"><span class="summary-label">Total Tunai Masuk</span><div class="summary-value">${formatRupiah(4875000)}</div><span class="summary-note">62 transaksi tunai</span></article><article class="card summary-card"><span class="summary-label">Non-Tunai (QRIS / EDC)</span><div class="summary-value">${formatRupiah(19845000)}</div><span class="summary-note">250 transaksi digital</span></article></div><article class="card"><div class="card-header"><div><h3 class="card-title">Rekonsiliasi Kasir</h3><p class="card-subtitle">Perhitungan fisik laci kasir untuk shift berjalan</p></div></div><div class="card-body"><div class="two-column"><div class="setting-row"><span><strong>Modal awal</strong><small>Saldo awal laci kas</small></span><strong>${formatRupiah(1000000)}</strong></div><div class="setting-row"><span><strong>Kas seharusnya</strong><small>Modal + transaksi tunai</small></span><strong>${formatRupiah(5875000)}</strong></div><div class="setting-row"><span><strong>Kas fisik dihitung</strong><small>Input hasil hitung kasir</small></span><input class="table-filter" type="number" value="5875000" aria-label="Kas fisik"></div><div class="setting-row"><span><strong>Selisih kas fisik</strong><small>Status rekonsiliasi</small></span><span class="badge-status status-completed">Rp 0 · Cocok</span></div></div><div style="margin-top:18px;text-align:right"><button class="btn-danger" type="button" data-action="close-shift"><i class="fa-solid fa-lock"></i>Tutup Shift Sekarang</button></div></div></article>`),
+        moduleSection("taxes", "Pajak & Diskon", "Konfigurasi pajak restoran dan kode promo pelanggan.", `<div class="setting-grid"><article class="card"><div class="card-header"><div><h3 class="card-title">Pajak &amp; Biaya Layanan</h3><p class="card-subtitle">Tarif yang diterapkan pada transaksi POS</p></div></div><div class="card-body setting-list"><div class="setting-row"><span><strong>Pajak PB1 Restoran</strong><small>Pajak barang dan jasa sebesar 10%</small></span><span class="badge-status status-completed">Aktif · 10%</span></div><div class="setting-row"><span><strong>Service Charge</strong><small>Biaya layanan untuk dine-in sebesar 5%</small></span><span class="badge-status status-completed">Aktif · 5%</span></div><div class="setting-row"><span><strong>Terapkan sebelum diskon</strong><small>Basis perhitungan promo</small></span><input type="checkbox" class="switch" checked aria-label="Terapkan pajak sebelum diskon"></div></div></article><article class="card"><div class="card-header"><div><h3 class="card-title">Voucher Promo</h3><p class="card-subtitle">Promo yang aktif untuk pelanggan Sajiva</p></div><button class="btn-quiet" type="button" data-action="add-voucher"><i class="fa-solid fa-plus"></i>Tambah</button></div><div class="card-body setting-list"><div class="setting-row"><span><span class="promo-code">SAJIVAHEMAT</span><small>Diskon 10% · Min. belanja ${formatRupiah(100000)}</small></span><span class="badge-status status-completed">Aktif</span></div><div class="setting-row"><span><span class="promo-code">NGOPIDULU</span><small>Potongan ${formatRupiah(10000)} · Min. belanja ${formatRupiah(50000)}</small></span><span class="badge-status status-completed">Aktif</span></div><div class="setting-row"><span><span class="promo-code">MAKANRAMAI</span><small>Gratis camilan · Min. belanja ${formatRupiah(150000)}</small></span><span class="badge-status status-pending">Terjadwal</span></div></div></article></div>`),
+        moduleSection("branches", "Kelola Cabang", "Informasi cabang, alamat, dan status koneksi mesin kasir.", tableCard("Jaringan Outlet", "Tiga cabang terhubung ke Sajiva Cloud POS", ["Nama Cabang", "Alamat", "Telepon", "Mesin Kasir", "Status"], branchRows), `<button class="btn-primary" type="button" data-action="add-branch"><i class="fa-solid fa-plus"></i>Tambah Cabang</button>`),
+        moduleSection("printers", "Printer & Struk", "Kelola perangkat cetak kasir dan dapur.", `<div class="setting-grid"><article class="card"><div class="card-header"><div><h3 class="card-title">Printer Kasir</h3><p class="card-subtitle">Perangkat utama untuk mencetak struk pelanggan</p></div><span class="badge-status status-completed"><i class="fa-solid fa-circle" style="font-size:5px"></i>Terhubung</span></div><div class="card-body"><div class="setting-row"><span><strong>Thermal Printer 80mm</strong><small>USB · USB001 · 192.168.1.88</small></span><i class="fa-solid fa-print" style="color:#2563eb;font-size:20px"></i></div><label class="setting-row"><span><strong>Cetak struk otomatis</strong><small>Setelah pembayaran berhasil</small></span><input type="checkbox" class="switch" checked aria-label="Cetak struk otomatis"></label><label class="setting-row"><span><strong>Tampilkan logo bisnis</strong><small>Di bagian atas struk transaksi</small></span><input type="checkbox" class="switch" checked aria-label="Tampilkan logo bisnis"></label><button class="btn-secondary" type="button" data-action="test-print"><i class="fa-solid fa-print"></i>Test Print Struk</button></div></article><article class="card"><div class="card-header"><div><h3 class="card-title">Printer Dapur</h3><p class="card-subtitle">Cetak tiket pesanan untuk tim dapur</p></div><span class="badge-status status-pending"><i class="fa-solid fa-circle" style="font-size:5px"></i>Siaga</span></div><div class="card-body"><div class="setting-row"><span><strong>Kitchen Printer BT-220</strong><small>Bluetooth · Perangkat tersimpan</small></span><i class="fa-solid fa-utensils" style="color:#f59e0b;font-size:19px"></i></div><label class="setting-row"><span><strong>Cetak tiket dapur otomatis</strong><small>Saat pesanan baru diterima</small></span><input type="checkbox" class="switch" checked aria-label="Cetak tiket dapur otomatis"></label><label class="setting-row"><span><strong>Sertakan catatan pesanan</strong><small>Instruksi khusus dari kasir</small></span><input type="checkbox" class="switch" aria-label="Sertakan catatan"></label><button class="btn-secondary" type="button" data-action="connect-printer"><i class="fa-brands fa-bluetooth-b"></i>Sambungkan Printer</button></div></article></div>`),
+        moduleSection("settings", "Pengaturan Akun", "Identitas bisnis yang tampil pada dashboard dan struk pelanggan.", `<div class="setting-grid"><article class="card"><div class="card-header"><div><h3 class="card-title">Profil Bisnis</h3><p class="card-subtitle">Informasi utama jaringan usaha Anda</p></div></div><form class="card-body setting-list" id="settings-form"><div class="field"><label for="business-name">Nama Bisnis</label><input id="business-name" name="business" value="Sajiva Kitchen &amp; Coffee" required></div><div class="field"><label for="business-email">Email Bisnis</label><input id="business-email" type="email" value="halo@sajiva.id"></div><div class="field"><label for="business-phone">Nomor Telepon</label><input id="business-phone" value="(021) 719-8801"></div><div class="field"><label for="receipt-note">Catatan Kaki Struk</label><textarea id="receipt-note" name="receipt">Terima kasih sudah mampir ke Sajiva! Sampai jumpa lagi ☕</textarea></div><button class="btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Simpan Pengaturan</button></form></article><article class="card"><div class="card-header"><div><h3 class="card-title">Preferensi Akun</h3><p class="card-subtitle">Zona waktu dan notifikasi sistem</p></div></div><div class="card-body setting-list"><div class="setting-row"><span><strong>Zona Waktu</strong><small>Waktu operasional jaringan outlet</small></span><strong>WIB · Asia/Jakarta</strong></div><div class="setting-row"><span><strong>Email laporan harian</strong><small>Rekap dikirim setiap penutupan toko</small></span><input type="checkbox" class="switch" checked aria-label="Email laporan harian"></div><div class="setting-row"><span><strong>Notifikasi stok minimum</strong><small>Peringatan untuk bahan baku kritis</small></span><input type="checkbox" class="switch" checked aria-label="Notifikasi stok minimum"></div><div class="setting-row"><span><strong>Alamat Instagram</strong><small>Profil sosial bisnis</small></span><strong>@sajiva.app</strong></div></div></article></div>`)
+      ];
+      const host = document.getElementById("generated-views");
+      host.innerHTML = templates.join("");
+      host.insertAdjacentHTML("afterbegin", moduleSection("customers", "Pelanggan", "Database member, poin loyalitas, dan total kunjungan.", customerBody, `<button class="btn-primary" type="button" data-action="add-member"><i class="fa-solid fa-user-plus"></i>Tambah Member</button>`));
+      host.insertAdjacentHTML("afterbegin", moduleSection("pos", "Kasir / POS", "Pilih menu, atur pesanan, lalu selesaikan pembayaran.", `<div class="pos-layout"><div class="pos-catalog"><div class="pos-controls"><div class="category-pills"><button class="category-pill active" data-category="all" type="button">Semua Menu</button><button class="category-pill" data-category="food" type="button">Makanan</button><button class="category-pill" data-category="drink" type="button">Minuman</button><button class="category-pill" data-category="snack" type="button">Camilan</button><button class="category-pill" data-category="dessert" type="button">Dessert</button></div><input class="pos-search" id="pos-search" type="search" placeholder="Cari nama menu..." aria-label="Cari menu"></div><div class="product-grid" id="product-grid"></div></div><aside class="card cart-panel"><div class="cart-heading"><div><h3>Keranjang Belanja</h3><small id="order-number"></small></div><button class="text-button" type="button" data-action="clear-cart">Kosongkan</button></div><div class="cart-options"><div class="field"><label for="order-type">Tipe Pesanan</label><select id="order-type"><option>Dine In</option><option>Take Away</option><option>Delivery</option></select></div><div class="field"><label for="customer-name">Nama Pelanggan</label><input id="customer-name" type="text" placeholder="Nama (opsional)"></div></div><div class="cart-items" id="cart-items"></div><div class="cart-summary"><div class="summary-line"><span>Subtotal</span><strong id="cart-subtotal">Rp 0</strong></div><div class="summary-line"><span>Pajak PB1 (10%)</span><strong id="cart-tax">Rp 0</strong></div><div class="summary-line total"><span>Total Bayar</span><strong id="cart-total">Rp 0</strong></div><div class="cart-actions"><button class="btn-secondary" type="button" data-action="hold-bill"><i class="fa-regular fa-clock"></i>Hold Bill</button><button class="btn-pos" type="button" data-action="pay"><i class="fa-solid fa-check"></i>Bayar</button></div></div></aside></div>`));
+      host.insertAdjacentHTML("afterbegin", moduleSection("orders", "Riwayat Pesanan", "Semua transaksi tercatat otomatis dan siap dicetak ulang.", orderBody, `<button class="btn-secondary" type="button" data-action="export"><i class="fa-solid fa-file-arrow-down"></i>Export</button>`));
+      renderPosProducts(currentCategory, "");
+      renderCart();
+      renderOrderHistory();
+    }
+
+    // ===== INIT & EVENTS =====
+    function handleAction(action, button) {
+      if (action === "open-pos") openDirectPos();
+      else if (action === "toggle-sidebar") toggleSidebar();
+      else if (action === "close-sidebar") closeSidebar();
+      else if (action === "switch-outlet") switchOutlet();
+      else if (action === "logout") showToast("Sesi demo Admin Sajiva tetap aktif.", "warning");
+      else if (action === "notifications") showToast("Tidak ada notifikasi baru.");
+      else if (action === "help") showToast("Pusat bantuan Sajiva siap membantu Anda.");
+      else if (action === "refresh") refreshOrders();
+      else if (action === "export") exportTransactions();
+      else if (action === "print") window.print();
+      else if (action === "clear-cart") clearCart(false);
+      else if (action === "qty") updateQty(button.dataset.id, Number(button.dataset.delta));
+      else if (action === "pay") processPayment();
+      else if (action === "hold-bill") holdCurrentBill();
+      else if (action === "receipt") showToast(`Struk ${button.dataset.id} siap dicetak.`);
+      else if (action === "filter-date") { renderOrderHistory(); showToast("Filter tanggal diterapkan."); }
+      else if (action === "add-member") showToast("Form member baru siap digunakan.");
+      else if (action === "add-product") showToast("Form produk baru siap digunakan.");
+      else if (action === "import") showToast("Pilih file katalog untuk memulai impor.");
+      else if (action === "edit-product") showToast("Detail produk siap diedit.");
+      else if (action === "add-category") showToast("Form kategori baru siap digunakan.");
+      else if (action === "restock") showToast("Permintaan restock bahan berhasil dicatat.");
+      else if (action === "stocktake") showToast("Stock opname dimulai untuk outlet terpilih.");
+      else if (action === "close-shift") showToast("Rekap shift tersimpan. Kas fisik cocok.", "warning");
+      else if (action === "add-voucher") showToast("Form voucher promo baru siap digunakan.");
+      else if (action === "add-branch") showToast("Form cabang baru siap digunakan.");
+      else if (action === "test-print") showToast("Tes struk berhasil dikirim ke printer kasir.");
+      else if (action === "connect-printer") showToast("Printer dapur siap disambungkan melalui Bluetooth.");
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      makeGeneratedViews();
+      renderRecentOrders();
+      renderBestSellers();
+      initializeCharts();
+      document.querySelectorAll(".nav-item").forEach((item) => item.addEventListener("click", () => navigateTab(item.dataset.tab, item)));
+      document.addEventListener("click", (event) => {
+        const category = event.target.closest("[data-category]");
+        if (category) filterPosCategory(category.dataset.category, category);
+        const period = event.target.closest("[data-period]");
+        if (period) setPeriod(period.dataset.period, period);
+        const product = event.target.closest("[data-add-product]");
+        if (product) addToCart(product.dataset.addProduct);
+        const action = event.target.closest("[data-action]");
+        if (action) handleAction(action.dataset.action, action);
+      });
+      document.getElementById("global-search").addEventListener("input", (event) => handleSearch(event.target.value));
+      document.getElementById("generated-views").addEventListener("input", (event) => {
+        if (event.target.id === "pos-search") renderPosProducts(currentCategory, event.target.value);
+      });
+      document.getElementById("generated-views").addEventListener("keydown", (event) => {
+        if ((event.key === "Enter" || event.key === " ") && event.target.matches(".product-card")) {
+          event.preventDefault();
+          addToCart(event.target.dataset.addProduct);
+        }
+      });
+      document.getElementById("settings-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const businessName = document.getElementById("business-name").value.trim();
+        if (!businessName) {
+          showToast("Nama bisnis wajib diisi.", "warning");
+          return;
+        }
+        showToast("Pengaturan berhasil disimpan!");
+      });
+      document.getElementById("global-search").addEventListener("focus", () => {
+        if (window.matchMedia("(max-width: 768px)").matches) navigateTab("pos");
+      });
+    });
+  </script>
+</body>
+</html>
